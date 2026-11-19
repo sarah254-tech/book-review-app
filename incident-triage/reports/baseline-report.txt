@@ -1,0 +1,76 @@
+
+==================================================
+KUBERNETES INCIDENT TRIAGE
+==================================================
+Namespace: book-review
+Context: aks-loadbalancer-lab
+Started: Wed Nov 18 20:18:26 UTC 2026
+
+==================================================
+PREFLIGHT VALIDATION
+==================================================
+[PASS] kubectl is available
+[PASS] Kubernetes context is accessible
+[PASS] Namespace is accessible
+
+==================================================
+1. POD DISCOVERY AND STATUS
+==================================================
+NAME                                    READY   STATUS    RESTARTS   AGE   IP            NODE                                NOMINATED NODE   READINESS GATES
+book-review-frontend-5f584df999-b9ddk   2/2     Running   0          8h    10.244.0.91   aks-nodepool1-38657871-vmss000000   <none>           <none>
+[PASS] 1 frontend Pod(s) match the configured selector
+
+==================================================
+2. CONTAINER READINESS
+==================================================
+POD                                     READY       PHASE
+book-review-backend-6557475659-rf8lx    true        Running
+book-review-frontend-5f584df999-b9ddk   true,true   Running
+book-review-mysql-0                     true        Running
+[PASS] All discovered containers are ready
+
+==================================================
+3. CONTAINER RESTART COUNTS
+==================================================
+POD                                     CONTAINERS     RESTARTS
+book-review-backend-6557475659-rf8lx    backend        0
+book-review-frontend-5f584df999-b9ddk   nextjs,nginx   0,0
+book-review-mysql-0                     mysql          0
+[PASS] No container restarts detected
+
+==================================================
+4. KUBERNETES EVENTS
+==================================================
+No resources found in book-review namespace.
+[PASS] Kubernetes events collected
+
+==================================================
+5. SERVICE READY BACKENDS
+==================================================
+
+Checking Service: book-review-frontend
+NAME                         ADDRESSTYPE   PORTS   ENDPOINTS     AGE
+book-review-frontend-jjhkf   IPv4          80      10.244.0.91   8h
+[PASS] Service book-review-frontend has 1 ready backend(s)
+
+Checking Service: book-review-backend
+NAME                        ADDRESSTYPE   PORTS   ENDPOINTS      AGE
+book-review-backend-qs22v   IPv4          3001    10.244.0.120   12h
+[PASS] Service book-review-backend has 1 ready backend(s)
+
+Checking Service: book-review-mysql
+NAME                      ADDRESSTYPE   PORTS   ENDPOINTS      AGE
+book-review-mysql-zqm2m   IPv4          3306    10.244.0.137   13h
+[PASS] Service book-review-mysql has 1 ready backend(s)
+
+==================================================
+TRIAGE SUMMARY
+==================================================
+PASS: 7
+WARN: 0
+FAIL: 0
+
+Workflow: Gather -> Analyze -> Human Act -> Verify
+Safety: Read-only investigation. No recovery actions executed.
+Overall result: PASS
+Exit code: 0

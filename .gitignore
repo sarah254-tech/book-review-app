@@ -9,3 +9,18 @@ frontend/.next/
 backend/.next/
 .DS_Store
 backend/.env
+# Node.js dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Operating system
+.DS_Store

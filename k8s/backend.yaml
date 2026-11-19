@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-review-backend
+  namespace: book-review
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: book-review-backend
+  template:
+    metadata:
+      labels:
+        app: book-review-backend
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/sarah254-tech/book-review-backend:assignment10
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3001
+              protocol: TCP
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: book-review-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: book-review-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: book-review-config
+                  key: DB_NAME
+            - name: DB_DIALECT
+              valueFrom:
+                configMapKeyRef:
+                  name: book-review-config
+                  key: DB_DIALECT
+            - name: DB_SSL
+              valueFrom:
+                configMapKeyRef:
+                  name: book-review-config
+                  key: DB_SSL
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: book-review-config
+                  key: PORT
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: book-review-secrets
+                  key: MYSQL_USER
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: book-review-secrets
+                  key: MYSQL_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: book-review-secrets
+                  key: JWT_SECRET
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-review-backend
+  namespace: book-review
+spec:
+  type: ClusterIP
+  selector:
+    app: book-review-backend
+  ports:
+    - name: http
+      port: 3001
+      targetPort: 3001
+      protocol: TCP
